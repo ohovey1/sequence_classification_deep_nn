@@ -3,6 +3,7 @@
 ## Goal
 
 The goal of this project is to take on a sequence classification task using deep learning. Given a dataset containing five taxi drivers' daily driving trajectories for 6 months, the objective is to build a NN to predict which driver a trajectory belongs to based on the testing set.
+
 -----------------------------------
 ## Proposal
 
@@ -11,10 +12,11 @@ Since we are dealing with a sequence classification task, my proposal is that an
 This repository is organized as follows:
 
     -- data
-        -- {csv files containing data}
+        -- {csv files containing driver data}
     -- data_loader.py
     -- models.py
     -- evaluation.py
+    -- test.py
 
 -----------------------------------
 ## Methodology
@@ -22,11 +24,82 @@ This repository is organized as follows:
 ### Data Preperation
 
 Data loading and preprocessing steps are handled in the data_loader.py file. The following preprocessing steps were taken:
-*TODO:*
 
+    1. Sorting and Grouping data by driver and day
+    2. Handling Status column
+    3. Extracting Features
+    4. Normalizing Features
+
+The data processing steps are handled inside data_loader.py, which includes two main functions:
+
+    load_data(data_dir):
+       
+        Method that reads the data from the data directory into a pandas dataframe.
+
+    preprocess_data(df):
+
+        Method that preprocesses data.
+
+        Output:
+            Data: a new pandas dataframe containing the preprocessed data.
+                dataset includes following normalized features:
+                    - longitude
+                    - latitude
+                    - distance
+                    - speed
+                    - sin_time
+                    - cos_time
+
+        Distance, speed, sin_time, and cos_time are extracted features to improve our dataset. Distance is calculated by taking the geographic distance between two concurrent latitude/longitudes. Speed is then derived from distance and time different. Finally, time is converted into sin and cosine representation. This is done to capture the cyclical nature of time data.
+
+        This function uses helper functions for each step, which are also defined in this module.
+
+Sequence creation:
+
+For this task, we will create sequences which will be fed to the model.
+After looking at the trajectory lengths for each driver, we notice that sequence length is heavily right-skewed -- meaning that most trajectories are short, but there are a few very long ones. For a sample dataset from the data directory, we see the following attributes of trajectory lengths:
+
+![alt text](images/trajectory_length_distribution.png)
+
+Since trajectories are of varying lengths, we will use padding and masking to handle variable-length sequences. We will pad sequences to the 95h percentile of the trajectory length distribution. This way, we'll preserve most of the data while keeping the sequence length manageable.
+
+Padding - adding zeros to the end of sequences to make them all the same length.
+
+Masking - ignoring padded zeros when calculating loss.
+
+### LSTM Construction
+
+Since were working on a sequence classification problem, I elected to implement an LSTM network. The model has the following architecture:
+
+- LSTM layers
+- Dropout layer for regularization
+- Fully connected layer (for output)
+
+Inputs:
+
+    - input_size: number of features in input data
+    - hidden_size: number of features in hidden state
+    - output_size: number of features in output
+    - num_layers: number of LSTM layers
+    - dropout: dropout rate for regularization
 
 ### Model Training
-*TODO:*
+
+For model training, we will create DataLoader to handle batch processing.
+Then, feed the model through the training loop and monitor loss. To train the model, we use CrossEntropyLoss and the Adam Optimizer. After training mulitple models with varying hyperparameters (batch_size, learning rate, etc.), the top performing model had the following hyperparamters:
+
+- learning_rate = .005
+- batch_size = 32
+- num_epochs = 10
+- hidden_layers = 128
+- num_layers = 3
+- dropout = .2
+
+I tested various numbers for each of these parameters and got varying results. Here is the training loss for the above parameters:
+
+![alt text](images/training_loss_3.png)
+
+Here we see gradual decreasing loss, with a final loss around ~1.58.
 
 -----------------------------------
 ## Empirical Results and Evaluation
