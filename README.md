@@ -15,10 +15,12 @@ This repository is organized as follows:
         -- {csv files containing raw driver data}
     -- images
         -- {png files containing charts/graphs}
+    -- models
+        -- {pth files containing lstm and gru models}
     -- data_loader.py
     -- models.py
     -- evaluation.py
-    -- preprocessed_data.csv 
+
 -----------------------------------
 ## Methodology
 
@@ -132,7 +134,7 @@ To evaluate the performance of the trained LSTM and GRU models, we used metrics 
 
 **LSTM  results after further tuning and longer training time:**
 
-Test accuracy: 75.16%
+Test accuracy: **75.16%**
 
 Test loss:
 
@@ -149,13 +151,11 @@ Hyperparameters:
 
 **GRU results after further tuning and longer training time:**
 
-Test accuracy: 
-
-*Fill in when model done training*
+Test accuracy: **79.84%**
 
 Test loss:
 
-*Fill in when model done training*
+![alt text](images/gru_loss.png)
 
 Hyperparameters:
 

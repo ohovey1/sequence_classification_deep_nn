@@ -16,27 +16,11 @@ from sklearn.model_selection import train_test_split
 
 from data_loader import load_data, preprocess_data, create_sequences
 
-# Real data
-# data_dir = 'data'
-# df = load_data(data_dir)
-# print('Data successfully loaded.')
-
-# df = preprocess_data(df)
-# print('Data successfully preprocessed.')
-# print(df.head(10))
-
-# # Save preprocessed data
-# df.to_csv('preprocessed_data.csv', index=False)
-
-# # Split into training and validation set, using .8/.2 split
-# df, val_df = train_test_split(df, test_size=0.2, random_state=42)
-
-
 '''
 LSTM Construction.
 
 Considerations for model construction:
-    1. Input data shape (batch_size, sequence_length, input_size)s
+    1. Input data shape (batch_size, sequence_length, input_size)
     2. LSTM layer
     3. Fully connected layer
     4. Regularization layer
@@ -68,9 +52,15 @@ class LSTMClassifier(nn.Module):
 '''
 GRU Construction.
 
-Due to poor LSTM performance, we will test out a GRU instead.
-This will be fairly straightforward since GRUs are similar to LSTMs, so we won't have to update
-the training loop, parameters, or model structure too significantly.
+Inputs:
+    - input_size: number of features in input data
+    - hidden_size: number of features in hidden state
+    - output_size: number of features in output
+    - num_layers: number of LSTM layers
+    - dropout: dropout rate for regularization
+
+Output:
+    - GRU model
 '''
 class GRUClassifier(nn.Module):
     def __init__(self, input_size, hidden_size, output_size, num_layers=1, dropout=0.2):
@@ -102,7 +92,7 @@ print(model)
 
 # Initialize optimizer and loss function
 optimizer = optim.Adam(model.parameters(), lr=0.0005) # Using Adam optimizer
-criterion = nn.CrossEntropyLoss(reduction='mean') # CrossEntropyLoss for multi-class classification. 'none' for masking
+criterion = nn.CrossEntropyLoss(reduction='mean') # CrossEntropyLoss for multi-class classification
 
 '''
 Step 3: Training the model.
@@ -113,24 +103,25 @@ Then, feed the model through the training loop and monitor loss
 # Load full preprocessed df
 #df = pd.read_csv('preprocessed_data.csv')
 #df = df[1:5000]
-df = load_data('sample_data')
-df = preprocess_data(df)
-print(df.head())
 
-# Get traj ids and split into training and validation set
-trajectory_ids = df['trajectory_id'].unique()
-train_ids, val_ids = train_test_split(trajectory_ids, test_size=0.2, random_state=42)
+# df = load_data('data')
+# df = preprocess_data(df)
+# print(df.head())
+# df.to_csv('preprocessed_data.csv', index=False)
 
-# Define training and validation dataframes
-train_df = df[df['trajectory_id'].isin(train_ids)]
-test_df = df[df['trajectory_id'].isin(val_ids)]
+# # Get traj ids and split into training and validation set
+# trajectory_ids = df['trajectory_id'].unique()
+# train_ids, val_ids = train_test_split(trajectory_ids, test_size=0.2, random_state=42)
 
-# # Create sequences and target tensors for train and test data
-print('Creating sequences...')
-X_train, y_train = create_sequences(train_df)
-print('Train sequences created.')
-X_test, y_test = create_sequences(test_df)
-print('Test sequences created.')
+# # Define training and validation dataframes
+# train_df = df[df['trajectory_id'].isin(train_ids)]
+# test_df = df[df['trajectory_id'].isin(val_ids)]
+
+# # # Create sequences and target tensors for train and test data
+# print('Creating sequences...')
+# X_train, y_train = create_sequences(train_df)
+# X_test, y_test = create_sequences(test_df)
+# print('Sequences successfully created.')
 
 '''
 Data Loading.
@@ -182,18 +173,18 @@ def collate_fn(batch):
 # Create DataLoader objects for batch handling, batch size 32
 batch_size = 32
 
-train_dataset = SequenceDataset(X_train, y_train)
-test_dataset = SequenceDataset(X_test, y_test)
+# train_dataset = SequenceDataset(X_train, y_train)
+# test_dataset = SequenceDataset(X_test, y_test)
 
-train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=False)
+# train_loader = DataLoader(train_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=True)
+# test_loader = DataLoader(test_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=False)
 
 # Training loop
 def train(model, train_loader):
     train_losses = []
     model.train()
     # Train the model
-    num_epochs = 100
+    num_epochs = 250
 
     # Training loop
     for epoch in range(num_epochs):
@@ -227,19 +218,19 @@ def train(model, train_loader):
     
     return train_losses
 
-train_losses = train(model, train_loader)
+#train_losses = train(model, train_loader)
 
 # After training, plot the loss
-plt.figure(figsize=(10, 6))
-plt.plot(train_losses, label='Training Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Training Loss Over Time')
-plt.legend()
-plt.show()
+# plt.figure(figsize=(10, 6))
+# plt.plot(train_losses, label='Training Loss')
+# plt.xlabel('Epoch')
+# plt.ylabel('Loss')
+# plt.title('Training Loss Over Time')
+# plt.legend()
+# plt.show()
 
 # Save the model
-torch.save(model.state_dict(), 'gru_model.pth')
+#torch.save(model.state_dict(), 'gru_model.pth')
 
 print('Model successfully trained and saved.')
 
@@ -295,21 +286,19 @@ def evaluate(model, test_loader):
             total += 1
         
             
-    print(f"Total correct: {total}")
-    print(len(all_targets))
-    print(total / len(all_targets))
+    print(f"Total correct: {total}\nTotal: {len(all_targets)}")
     print(f"Test Accuracy: {accuracy * 100:.2f}%")
 
     # Return predictions and targets for further analysis or reporting
     return all_predictions, all_targets
 
 print(model)
-all_predictions, all_targets = evaluate(model, test_loader)
+#all_predictions, all_targets = evaluate(model, test_loader)
 # Save predictions and targets to a CSV file for further analysis
-results_df = pd.DataFrame({
-    'Predictions': all_predictions,
-    'Targets': all_targets
-})
+# results_df = pd.DataFrame({
+#     'Predictions': all_predictions,
+#     'Targets': all_targets
+# })
 
-results_df.to_csv('predictions_targets.csv', index=False)
-print('Predictions and targets successfully saved to predictions_targets.csv.')
+#results_df.to_csv('predictions_targets.csv', index=False)
+print('Predictions and targets successfully saved to predictions_targets.csv.')#

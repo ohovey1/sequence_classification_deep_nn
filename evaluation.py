@@ -69,7 +69,7 @@ def run(data,model):
 
 
 # Recreating  model architecture
-input_size = 7  # Number of input features
+input_size = 9  # Number of input features
 hidden_size = 256  # Hidden size used during training
 output_size = 5  # Number of driver classes
 num_layers = 3  # Number of GRU layers
