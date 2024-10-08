@@ -91,6 +91,11 @@ model.eval()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)
 
+######################################
+## To run with custom data, replace ##
+## data with desired trajectory.    ##
+######################################
+
 data = [[114.10437, 22.573433, '2016-07-02 00:08:45', 1],
             [114.179665, 22.558701, '2016-07-02 00:08:52', 1]]
 
