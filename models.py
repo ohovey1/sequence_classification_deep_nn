@@ -84,7 +84,7 @@ num_layers = 3 # Number of stacked LSTM layers, using 2 for now
 dropout = 0.2 # Dropout rate for regularization
 
 # Initialize model
-model = GRUClassifier(input_size, hidden_size, output_size, num_layers, dropout)
+model = LSTMClassifier(input_size, hidden_size, output_size, num_layers, dropout)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 print('Model successfully initialized.')
@@ -100,16 +100,19 @@ Step 3: Training the model.
 For model training, we will create DataLoader to handle batch processing.
 Then, feed the model through the training loop and monitor loss
 '''
-# Load full preprocessed df
+# Load full preprocessed df (if available)
 #df = pd.read_csv('preprocessed_data.csv')
-#df = df[1:5000]
 
+# Otherwise, load data
 # df = load_data('data')
-# df = preprocess_data(df)
-# print(df.head())
+#df = preprocess_data(df)
 # df.to_csv('preprocessed_data.csv', index=False)
 
-# # Get traj ids and split into training and validation set
+#print(df.head())
+
+
+# Get traj ids and split into training and validation set
+
 # trajectory_ids = df['trajectory_id'].unique()
 # train_ids, val_ids = train_test_split(trajectory_ids, test_size=0.2, random_state=42)
 
@@ -171,7 +174,8 @@ def collate_fn(batch):
     return padded_sequences, targets, lengths
 
 # Create DataLoader objects for batch handling, batch size 32
-batch_size = 32
+
+# batch_size = 32
 
 # train_dataset = SequenceDataset(X_train, y_train)
 # test_dataset = SequenceDataset(X_test, y_test)
@@ -230,9 +234,9 @@ def train(model, train_loader):
 # plt.show()
 
 # Save the model
-#torch.save(model.state_dict(), 'gru_model.pth')
+#torch.save(model.state_dict(), 'lstm_model.pth')
 
-print('Model successfully trained and saved.')
+#print('Model successfully trained and saved.')
 
 '''
 Step 4: Evaluation.
@@ -241,9 +245,9 @@ Using test_df, we will preprocess the data and create sequences.
 Then, we will evaluate the model using the validation set and get the accuracy of the model
 '''
 # Load the model
-model.load_state_dict(torch.load('gru_model.pth'))
-model.eval()
-model.to(device)
+#model.load_state_dict(torch.load('gru_model.pth'))
+# model.eval()
+# model.to(device)
 
 # Evaluate the model
 def evaluate(model, test_loader):
@@ -292,13 +296,13 @@ def evaluate(model, test_loader):
     # Return predictions and targets for further analysis or reporting
     return all_predictions, all_targets
 
-print(model)
-#all_predictions, all_targets = evaluate(model, test_loader)
-# Save predictions and targets to a CSV file for further analysis
+# print(model)
+# all_predictions, all_targets = evaluate(model, test_loader)
+# # Save predictions and targets to a CSV file for further analysis
 # results_df = pd.DataFrame({
 #     'Predictions': all_predictions,
 #     'Targets': all_targets
 # })
 
 #results_df.to_csv('predictions_targets.csv', index=False)
-print('Predictions and targets successfully saved to predictions_targets.csv.')#
+#print('Predictions and targets successfully saved to predictions_targets.csv.')

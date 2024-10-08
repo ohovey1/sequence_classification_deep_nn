@@ -21,6 +21,17 @@ This repository is organized as follows:
     -- models.py
     -- evaluation.py
 
+***NOTE:***
+
+To test the performance of the model, directly run the evaluation.py file with desired input trajectories in the format:
+
+        data = [[114.10437, 22.573433, '2016-07-02 00:08:45', 1],
+            [114.179665, 22.558701, '2016-07-02 00:08:52', 1]]
+
+Both the process_data and run functions have been implemented so that both the LSTM and GRU models can be ran by calling these two functions. 
+
+It is required that data_loader.py and models.py are also in the same directory.
+
 -----------------------------------
 ## Methodology
 
@@ -134,11 +145,11 @@ To evaluate the performance of the trained LSTM and GRU models, we used metrics 
 
 **LSTM  results after further tuning and longer training time:**
 
-Test accuracy: **75.16%**
+Test accuracy: **70.09%**
 
 Test loss:
 
-![alt text](images/training_loss_9.png)
+![alt text](images/lstm_loss.png)
 
 Hyperparameters:
 
@@ -170,7 +181,7 @@ Hyperparameters:
 -----------------------------------
 ## Conclusion
 
-Overall this task took a lot of time and data manipulation to get any meaningful results. Working with sequence data can be a challenging task and there were multiple obstacles that needed to be overcome to train a workable model. Some of the largest obstacles we faced were:
+Overall this task took a lot of time and data manipulation to get any meaningful results. Working with sequence data can be a challenging task and there were multiple obstacles that needed to be overcome to train a workable model. However, we were able to improve our accuracy from just 20% to upwards of 80%, which is great improvement. Some of the largest obstacles faced were:
 
 - Feature extraction
 - How to create sequences and handle varying length trajectories
